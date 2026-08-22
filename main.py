@@ -1,4 +1,4 @@
-asyncio, subprocess, threading
+import asyncio, subprocess, threading
 from telethon import TelegramClient, events
 from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
