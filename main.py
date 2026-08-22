@@ -3,22 +3,29 @@ from telethon import TelegramClient, events
 from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-# ১. হেলথ চেক ওয়েব সার্ভার (Render-এর Timed Out আটকানোর জন্য)
+# Render-এর Health Check (HEAD ও GET দুটোই হ্যান্ডেল করবে)
 class HealthCheckHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"Bot is active!")
 
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
+
+    def log_message(self, format, *args):
+        return  # ফালতু লগে স্ক্রিন ভর্তি হওয়া বন্ধ রাখবে
+
 def run_health_server():
     port = int(os.environ.get("PORT", 10000))
     server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
     server.serve_forever()
 
-# সবার আগে ওয়েব সার্ভার ব্যাকগ্রাউন্ডে চালু করা
+# ব্যাকগ্রাউন্ডে হেলথ চেক সার্ভার চালু
 threading.Thread(target=run_health_server, daemon=True).start()
 
-# ২. টেলিগ্রাম বোট কনফিগারেশন
+# টেলিগ্রাম বোট কনফিগারেশন
 API_ID = 39941595
 API_HASH = 'af2f3926bc453f96da9ba2e47b4a1a7e'
 BOT_TOKEN = '8339320362:AAHX7ZS7s4MOLJgPqS34Wna__oHhHQGgh_A'
