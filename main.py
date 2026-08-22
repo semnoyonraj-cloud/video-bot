@@ -1,17 +1,37 @@
-import os, asyncio, subprocess
+import os, asyncio, subprocess, threading
 from telethon import TelegramClient, events
 from PIL import Image
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# Render-এর পোর্ট চেকের জন্য ডামি ওয়েব সার্ভার
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is active!")
+
+def run_health_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    server.serve_forever()
 
 API_ID = 39941595
 API_HASH = 'af2f3926bc453f96da9ba2e47b4a1a7e'
 BOT_TOKEN = '8339320362:AAHX7ZS7s4MOLJgPqS34Wna__oHhHQGgh_A'
 
 async def main():
+    # ব্যাকগ্রাউন্ডে পোর্ট সার্ভিস রান থাকবে
+    threading.Thread(target=run_health_server, daemon=True).start()
+
     bot = TelegramClient('cloud_bot', API_ID, API_HASH)
     await bot.start(bot_token=BOT_TOKEN)
 
     @bot.on(events.NewMessage)
     async def handler(event):
+        if event.text and '/start' in event.text:
+            await event.respond("✅ **বট অনলাইন আছে!** লোগো পাঠান, তারপর ভিডিও দিন।")
+            return
+
         if event.photo:
             await bot.download_media(event.message, file="logo.png")
             await event.respond("✅ লোগো সেভড!")
