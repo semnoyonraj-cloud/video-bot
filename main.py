@@ -1,4 +1,4 @@
-import os, asyncio, subprocess, threading
+asyncio, subprocess, threading
 from telethon import TelegramClient, events
 from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -72,4 +72,4 @@ async def main():
     await bot.run_until_disconnected()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(main()
